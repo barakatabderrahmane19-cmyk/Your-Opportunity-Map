@@ -4,8 +4,7 @@ Application web de **recherche et de suivi des stages et opportunités IT à Mar
 Elle collecte les entreprises informatiques via l'API Google Places, nettoie les données,
 les affiche sur un tableau et une carte, compare votre CV aux entreprises et suit vos candidatures.
 
-🔗 **Application en ligne : [(https://your-opportunity-map-hnqmqsensmevxf4biuky3j.streamlit.app/)]**
-
+🔗 **Application en ligne : [https://your-opportunity-map-hnqmqsensmevxf4biuky3j.streamlit.app/](https://your-opportunity-map-hnqmqsensmevxf4biuky3j.streamlit.app/)**
 ## ✨ Fonctionnalités
 
 | Onglet | Rôle |
@@ -26,8 +25,8 @@ Python 3.12 · Streamlit · Pandas · Altair · Folium · pydeck · Google Place
 
 ```bash
 # 1. Récupérer le code
-git clone https://github.com/TON-NOM/NOM-DU-DEPOT.git
-cd NOM-DU-DEPOT
+git clone https://github.com/barakatabderrahmane19-cmyk/Your-Opportunity-Map.git
+cd Your-Opportunity-Map
 
 # 2. Créer un environnement virtuel (recommandé)
 python -m venv venv
@@ -82,4 +81,4 @@ L'application s'ouvre sur http://localhost:8501.
 
 ## 👤 Auteur
 
-**[Barakat abderrahmane]** – Projet réalisé dans le cadre de [Assistant data analyst / ISTA NTIC].
+   **Barakat Abderrahmane** – Projet réalisé dans le cadre de la formation Assistant data analyst / ISTA NTIC.
