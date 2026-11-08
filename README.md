@@ -4,7 +4,7 @@ Application web de **recherche et de suivi des stages et opportunités IT à Mar
 Elle collecte les entreprises informatiques via l'API Google Places, nettoie les données,
 les affiche sur un tableau et une carte, compare votre CV aux entreprises et suit vos candidatures.
 
-🔗 **Application en ligne : [À COMPLÉTER : lien Streamlit Cloud]**
+🔗 **Application en ligne : [(https://your-opportunity-map-hnqmqsensmevxf4biuky3j.streamlit.app/)]**
 
 ## ✨ Fonctionnalités
 
