@@ -81,4 +81,4 @@ L'application s'ouvre sur http://localhost:8501.
 
 ## 👤 Auteur
 
-   **Barakat Abderrahmane** – Projet réalisé dans le cadre de la formation Assistant data analyst / ISTA NTIC.
+   **Barakat Abderrahmane** – Projet réalisé dans le cadre de la formation Assistant data analyst / ISTA NTIC SYBA.
