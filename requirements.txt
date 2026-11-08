@@ -7,3 +7,4 @@ streamlit-folium
 pypdf
 python-docx
 openpyxl
+google-genai

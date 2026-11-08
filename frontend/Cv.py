@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import date
+from frontend.ia_candidature import afficher_generateur_candidature
 
 from backend.data_processing import (
     charger_donnees,
@@ -303,3 +304,4 @@ def afficher_cv():
                 url,
                 use_container_width=True
             )
+    afficher_generateur_candidature(texte, top)
