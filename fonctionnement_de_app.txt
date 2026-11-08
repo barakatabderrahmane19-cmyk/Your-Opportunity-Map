@@ -1,0 +1,225 @@
+                             YOUR OPPORTUNITY MAP — FONCTIONNEMENT DE L'APPLICATION
+                                Suivi des stages et opportunités IT à Marrakech
+
+================================================================================================================
+1) VUE D'ENSEMBLE
+================================================================================================================
+
+                                  ┌──────────────────────────────────────────┐
+                                  │               UTILISATEUR                │
+                                  │    Cherche des entreprises, suit ses     │
+                                  │       candidatures, dépose son CV        │
+                                  └──────────────────────────────────────────┘
+                                                        ▼
+                        ┌──────────────────────────────────────────────────────────────┐
+                        │          STREAMLIT — app.py (interface principale)           │
+                        │                Thème : .streamlit/config.toml                │
+                        │      Habillage : frontend/style.py -> appliquer_style()      │
+                        └──────────────────────────────────────────────────────────────┘
+                                                        │
+                                                        │
+          ┌──────────────────────┬──────────────────────┼──────────────────────┬──────────────────────┐
+          ▼                      ▼                      ▼                      ▼                      ▼
+┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐
+│     ONGLET 1     │   │     ONGLET 2     │   │     ONGLET 3     │   │     ONGLET 4     │   │     ONGLET 5     │
+│   Entreprises    │   │     Données      │   │   Opportunités   │   │      Mon CV      │   │   Statistiques   │
+│  entreprises.py  │   │    donnees.py    │   │ opportunites.py  │   │      cv.py       │   │ statistiques.py  │
+└──────────────────┘   └──────────────────┘   └──────────────────┘   └──────────────────┘   └──────────────────┘
+          │                      │                      │                      │                      │
+          │                      │                      │                      │                      │
+          ▼                      ▼                      ▼                      ▼                      ▼
+┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐
+│     BACKEND      │   │     BACKEND      │   │     BACKEND      │   │     BACKEND      │   │     BACKEND      │
+│ google_places.py │   │ data_quality.py  │   │ opportunities.py │   │  cv_matching.py  │   │ statistiques.py  │
+│data_processing.py│   │data_processing.py│   │   (suivi CSV)    │   │ (analyse du CV)  │   │    (calculs)     │
+└──────────────────┘   └──────────────────┘   └──────────────────┘   └──────────────────┘   └──────────────────┘
+          │                      │                      │                      │                      │
+          ▼                      ▼                      ▼                      ▼                      ▼
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                            data/  (fichiers CSV)                                             │
+│  entreprises_informatique_brutes.csv | entreprises_informatique_marrakech.csv | opportunites_marrakech.csv   │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+================================================================================================================
+2) ONGLET 1 — ENTREPRISES  (frontend/entreprises.py)
+Collecte Google Places -> nettoyage -> affichage -> ajout au suivi
+================================================================================================================
+
+ ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐
+ │    Barre latérale     │   │collecter_entreprises_ │   │  rechercher_google_   │   │  transformer_places_  │
+ │    Clé API Google     │──▶│   multi_requetes()    │──▶│       places()        │──▶│    en_dataframe()     │
+ │  ou mode simulation   │   │catégories x quartiers │   │  Google Places (New)  │   │+ determine_subsector()│
+ └───────────────────────┘   └───────────────────────┘   └───────────────────────┘   └───────────────────────┘
+                                                                                                 │
+             ┌───────────────────────────────────────────────────────────────────────────────────┘
+             │
+             │
+             │
+             ▼
+ ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐
+ │  nettoyer_donnees()   │   │    2 fichiers CSV     │   │       Affichage       │   │     Carte Folium      │
+ │doublons, coordonnées, │──▶│   brutes + propres    │──▶│filtres, tableau, liens│──▶│  + Ajouter au suivi   │
+ │  valeurs manquantes   │   │    (dossier data/)    │   │site / WhatsApp / Maps │   │  ajouter_si_absent()  │
+ └───────────────────────┘   └───────────────────────┘   └───────────────────────┘   └───────────────────────┘
+
+================================================================================================================
+3) ONGLET 2 — DONNÉES  (frontend/donnees.py)
+5 sous-onglets : consulter, contrôler la qualité, explorer une fiche
+================================================================================================================
+
+                     ┌────────────────────────────────────────────────────────────────────┐
+                     │    donnees.py  —  charger_donnees_brutes() / charger_donnees()     │
+                     │              lit les 2 fichiers CSV du dossier data/               │
+                     └────────────────────────────────────────────────────────────────────┘
+                                                        │
+                                                        │
+          ┌──────────────────────┬──────────────────────┼──────────────────────┬──────────────────────┐
+          ▼                      ▼                      ▼                      ▼                      ▼
+┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐
+│  Vue d'ensemble  │   │  Données brutes  │   │     Données      │   │     Qualité      │   │ Fiche entreprise │
+│  score qualité,  │   │    recherche,    │   │    nettoyées     │   │fiches incomplètes│   │détails, boutons, │
+│  diagnostic du   │   │  téléchargement  │   │ filtres, liens,  │   │    doublons,     │   │   mini-carte,    │
+│    nettoyage,    │   │   CSV / Excel    │   │   export CSV /   │   │  hors Marrakech  │   │  ajout au suivi  │
+│    complétude    │   │                  │   │      Excel       │   │                  │   │                  │
+└──────────────────┘   └──────────────────┘   └──────────────────┘   └──────────────────┘   └──────────────────┘
+          ▼                                                                    ▼
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                          data_quality.py  (backend)                                          │
+│                            completude(), score_qualite(), diagnostic_nettoyage(),                            │
+│                        fiches_incompletes(), doublons_potentiels(), hors_marrakech()                         │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+================================================================================================================
+4) ONGLET 3 — OPPORTUNITÉS  (frontend/opportunites.py)
+Formulaire -> CSV -> tableau éditable -> enregistrement
+================================================================================================================
+
+ ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐
+ │      Formulaire       │   │ ajouter_opportunite() │   │     opportunites_     │   │  Métriques + filtre   │
+ │ entreprise (liste ou  │   │  (opportunities.py)   │   │     marrakech.csv     │   │  Total, À contacter,  │
+ │   saisie manuelle),   │──▶│                       │──▶│                       │──▶│     Candidatures,     │
+ │  poste, type, statut  │   │                       │   │                       │   │ Entretiens, Acceptées │
+ └───────────────────────┘   └───────────────────────┘   └───────────────────────┘   └───────────────────────┘
+                                                                                                 │
+             ┌───────────────────────────────────────────────────────────────────────────────────┘
+             │
+             │
+             │
+             ▼
+ ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐
+ │   Tableau éditable    │   │  Bouton Enregistrer   │   │    CSV mis à jour     │   │    Téléchargement     │
+ │   st.data_editor :    │   │     sauvegarder_      │   │    (ligne modifiée    │   │        CSV des        │
+ │ statut, notes, lien,  │──▶│    opportunites()     │──▶│     ou supprimée)     │──▶│     opportunités      │
+ │  case « Supprimer »   │   │                       │   │                       │   │                       │
+ └───────────────────────┘   └───────────────────────┘   └───────────────────────┘   └───────────────────────┘
+
+================================================================================================================
+5) ONGLET 4 — MON CV  (frontend/cv.py)
+Le CV est lu dans l'application : il n'est ni envoyé sur Internet ni enregistré
+================================================================================================================
+
+ ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐
+ │      Dépôt du CV      │   │  extraire_texte_cv()  │   │     analyser_cv()     │   │ classer_entreprises() │
+ │   PDF, DOCX ou TXT    │   │  pypdf / python-docx  │   │compétences + secteurs │   │     score 0-100 +     │
+ │                       │──▶│                       │──▶│      (mots-clés)      │──▶│      explication      │
+ │                       │   │                       │   │                       │   │     « Pourquoi »      │
+ └───────────────────────┘   └───────────────────────┘   └───────────────────────┘   └───────────────────────┘
+                                                                                                 │
+             ┌───────────────────────────────────────────────────────────────────────────────────┘
+             │
+             │
+             │
+             ▼
+ ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐
+ │    Tableau classé     │   │    Ajout au suivi     │   │   liens_recherche_    │   │     session_state     │
+ │barre de compatibilité,│   │ plusieurs entreprises │   │       offres()        │   │     cv_resultats      │
+ │ téléphone, WhatsApp,  │──▶│  ajouter_si_absent()  │──▶│   LinkedIn, Indeed,   │──▶│      -> onglet 5      │
+ │       site web        │   │                       │   │        Google         │   │     Statistiques      │
+ └───────────────────────┘   └───────────────────────┘   └───────────────────────┘   └───────────────────────┘
+
+================================================================================================================
+6) ONGLET 5 — STATISTIQUES  (frontend/statistiques.py)
+Graphiques Altair + carte de chaleur pydeck
+================================================================================================================
+
+ ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐
+ │        Filtres        │   │  preparer_donnees()   │   │    repartition(),     │   │Graphiques entreprises │
+ │       secteurs,       │   │    distance, zone,    │   │   mots_frequents(),   │   │  secteurs, contacts,  │
+ │« Marrakech seulement »│──▶│   quartier, contact   │──▶│   pourcentage_site_   │──▶│ distance, quartiers,  │
+ │ (<= 25 km du centre)  │   │                       │   │     par_secteur()     │   │   carte de chaleur    │
+ └───────────────────────┘   └───────────────────────┘   └───────────────────────┘   └───────────────────────┘
+                                                                                                 │
+             ┌───────────────────────────────────────────────────────────────────────────────────┘
+             │
+             │
+             │
+             ▼
+ ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐
+ │       charger_        │   │  Graphiques du suivi  │   │     cv_resultats      │   │     Graphiques CV     │
+ │    opportunites()     │   │  entonnoir, sources,  │   │(venant de l'onglet 4) │   │ distribution scores,  │
+ │     stats_suivi()     │──▶│   candidatures par    │──▶│                       │──▶│    score moyen par    │
+ │                       │   │        semaine        │   │                       │   │        secteur        │
+ └───────────────────────┘   └───────────────────────┘   └───────────────────────┘   └───────────────────────┘
+
+================================================================================================================
+7) STRUCTURE DU PROJET
+================================================================================================================
+
+your opportunity project by barakat/
+│
+├── app.py                         Point d'entrée : 5 onglets + thème
+├── .streamlit/
+│   ├── config.toml                Thème (couleurs)             <- partageable
+│   └── secrets.toml               Clé Google API               <- NE JAMAIS PARTAGER
+│
+├── frontend/                      Interface (ce que l'utilisateur voit)
+│   ├── entreprises.py             Onglet 1 : collecte, tableau, carte
+│   ├── donnees.py                 Onglet 2 : données, qualité, fiche entreprise
+│   ├── opportunites.py            Onglet 3 : suivi éditable des candidatures
+│   ├── cv.py                      Onglet 4 : CV et entreprises compatibles
+│   ├── statistiques.py            Onglet 5 : graphiques
+│   └── style.py                   Habillage (cartes, onglets, titre)
+│
+├── backend/                       Logique (calculs et fichiers)
+│   ├── google_places.py           Appels Google Places API (New), sauvegarde
+│   ├── data_processing.py         Nettoyage, secteurs, url_propre, whatsapp_url
+│   ├── opportunities.py           Lecture / écriture du suivi
+│   ├── cv_matching.py             Lecture du CV, compétences, score
+│   ├── statistiques.py            Préparation des données des graphiques
+│   └── data_quality.py            Complétude, doublons, hors zone
+│
+└── data/                          Données (fichiers CSV)
+    ├── entreprises_informatique_brutes.csv
+    ├── entreprises_informatique_marrakech.csv
+    └── opportunites_marrakech.csv
+
+================================================================================================================
+8) FLUX DE DONNÉES EN BREF
+================================================================================================================
+
+ ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐   ┌───────────────────────┐
+ │   Google Places API   │   │    Données brutes     │   │  nettoyer_donnees()   │   │    Données propres    │
+ │ (ou mode simulation)  │──▶│ (fichier brutes.csv)  │──▶│doublons, coordonnées, │──▶│(fichier marrakech.csv)│
+ │                       │   │                       │   │  valeurs manquantes   │   │                       │
+ └───────────────────────┘   └───────────────────────┘   └───────────────────────┘   └───────────────────────┘
+                                                                                                 │
+                                                                                                 │
+             ┌───────────────────────────┬───────────────────────────┬───────────────────────────┐
+             ▼                           ▼                           ▼                           ▼
+ ┌──────────────────────┐    ┌──────────────────────┐    ┌──────────────────────┐    ┌──────────────────────┐
+ │       Onglet 1       │    │       Onglet 2       │    │       Onglet 4       │    │       Onglet 5       │
+ │     Entreprises      │    │       Données        │    │        Mon CV        │    │     Statistiques     │
+ │   tableau, carte,    │    │       qualité,       │    │      score des       │    │      graphiques      │
+ │    ajout au suivi    │    │   fiche entreprise   │    │     entreprises      │    │                      │
+ └──────────────────────┘    └──────────────────────┘    └──────────────────────┘    └──────────────────────┘
+             │                           │                           │
+             │                           │                           │
+             ▼                           ▼                           ▼
+ ┌────────────────────────────────────────────────────────────────────────────────┐
+ │          Onglet 3 — Opportunités : opportunites_marrakech.csv (suivi)          │
+ │           alimenté par les onglets 1, 2, 3 et 4 (ajouter_si_absent)            │
+ └────────────────────────────────────────────────────────────────────────────────┘
+
+ L'onglet 5 lit aussi le suivi (stats_suivi) et les résultats du CV (cv_resultats).
+
+Légende :  ──▶ enchaînement   ▼ passage à l'étape suivante   CSV = fichier de données dans data/

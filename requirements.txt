@@ -1,0 +1,9 @@
+streamlit>=1.40
+pandas
+numpy
+requests
+folium
+streamlit-folium
+pypdf
+python-docx
+openpyxl
