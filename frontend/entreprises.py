@@ -876,11 +876,17 @@ def afficher_entreprises():
                 </div>
                 """
 
-                folium.Marker(
+                folium.CircleMarker(
                     location=[
                         row["latitude"],
                         row["longitude"]
                     ],
+                    radius=6,
+                    color="#1F2A44",
+                    weight=1,
+                    fill=True,
+                    fill_color="#E4572E",
+                    fill_opacity=0.85,
                     popup=folium.Popup(
                         popup_html,
                         max_width=300
